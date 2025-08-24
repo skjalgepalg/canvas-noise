@@ -1,7 +1,10 @@
 import { Pane } from 'tweakpane'
 import { getNoise } from './noise'
-import { params } from './params'
+import { defaultParams } from './params'
 import { setupTweakPane } from './tweakpane'
+
+/** @type {import('./params').defaultParams} */
+let params
 
 /**
  * @type CanvasRenderingContext2D
@@ -25,14 +28,11 @@ function periodicFunction(progress, offset, x, y) {
   // R is the radius of the circle
   const R = params.noiseRadius
   // S is the scale of the noise
-  // const S = 0.016
   const S = params.noiseScale
   // P is the progress of the animation
   const P = progress
 
   return noise(
-    // return noise3D(
-    // return noise4D(
     offset + R * Math.cos(P * TWO_PI),
     R * Math.sin(P * TWO_PI),
     S * y,
@@ -98,6 +98,9 @@ function loop(frameN) {
     // Stop the capturer and save the video
     capturer.stop()
     capturer.save()
+    params.record = false
+    capturer = null
+    console.log('Capturer stopped', { params })
   } else {
     // Restart the loop
     requestAnimationFrame(loop.bind(null, 0))
@@ -128,30 +131,26 @@ function resizeCanvas(targetCanvas) {
 
 // Initialize the canvas and capturer
 function init() {
+  // Setup params, destructure to avoid mutating defaultParams
+  params = { ...defaultParams }
+
+  console.log('init', { params })
+  // Setup canvas
   const canvas = document.createElement('canvas')
   resizeCanvas(canvas)
   document.body.appendChild(canvas)
   ctx = canvas.getContext('2d')
-  noise = getNoise(params.noiseType)
+  // Setup noise
+  noise = getNoise(params)
 
   const pane = new Pane()
 
-  setupTweakPane(pane)
+  setupTweakPane(pane, params, startAnimation)
 
   pane.on('change', (event) => {
     if (event.last) {
       console.log(event)
       resizeCanvas(canvas)
-      noise = getNoise(params.noiseType)
-    }
-    if (params.record) {
-      capturer = new CCapture({
-        format: 'webm',
-        workersPath: 'node_modules/ccapture.js/build/',
-        framerate: 25,
-        quality: 100,
-      })
-      capturer.start()
     }
   })
 

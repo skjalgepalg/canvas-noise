@@ -1,9 +1,9 @@
-import { params } from './params'
-
 /**
  * @param {import('tweakpane').Pane} pane
+ * @param {import('./params').defaultParams} params
+ * @param {() => void} restartAnimationCallback
  */
-export const setupTweakPane = (pane) => {
+export const setupTweakPane = (pane, params, restartAnimationCallback) => {
   const recordingFolder = pane.addFolder({
     title: 'Recording',
     expanded: false,

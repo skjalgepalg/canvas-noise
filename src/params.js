@@ -1,13 +1,20 @@
-export const params = {
+export const defaultParams = {
   // Seed
-  seed: 'snerk-2025-08-24',
+  seed: 'Snerk',
   // Noise
-  noiseType: '2D',
-  noiseOffset: 0,
+  noiseType: '3D',
   noiseScale: 0.007,
-  noiseRadius: 1.6,
-  noiseSpeed: 1,
+  noiseRadius: 0.2,
   // Animation
+  xStep: 10,
+  yStep: 10,
+  dotSize: 1,
+  green: 191,
+  red: 10,
+  blue: 228,
+  greenTaper: 'none',
+  redTaper: 'none',
+  blueTaper: 'none',
   compositeOperation: 'lighter',
   // Recording
   record: false, // Set true and reload to save a recording

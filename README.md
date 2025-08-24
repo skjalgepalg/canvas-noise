@@ -10,8 +10,8 @@ Used as basis of exploring multithreading as part of [innovasjonsdag-web-workers
 
 ## Export loop as video
 
-We can use ccapture.js to export frames as a webm which should be automatically downloaded
-Then use ffmpeg ([how to install]())
+We use ccapture.js to export frames as a webm by setting `CAPTURE=true`.
+Then use [ffmpeg](https://ffmpeg.org/) to convert to mp4 with matching framerate to our settings and then looping 3 times to generate a file with
 
 ```sh
   ffmpeg -i path-to-exported.webm -r 25 output.mp4

@@ -11,11 +11,15 @@ export const setupTweakPane = (pane, params, restartAnimationCallback) => {
   recordingFolder.addBinding(params, 'frameRate')
   recordingFolder.addBinding(params, 'duration')
 
-  recordingFolder.addButton({
+  const recordButton = recordingFolder.addButton({
     title: 'Start Recording',
-    onClick: () => {
-      params.record = !params.record
-    },
+    label: 'Start Recording',
+  })
+  recordButton.on('click', () => {
+    params.record = !params.record
+    recordButton.label = params.record ? 'Stop Recording' : 'Start Recording'
+    pane.refresh()
+    restartAnimationCallback()
   })
 
   const canvasFolder = pane.addFolder({
@@ -47,11 +51,62 @@ export const setupTweakPane = (pane, params, restartAnimationCallback) => {
     title: 'Animation',
     expanded: true,
   })
-  animationFolder.addBinding(params, 'noiseType', {
+  animationFolder.addBinding(params, 'seed')
+  const noiseType = animationFolder.addBinding(params, 'noiseType', {
     options: {
       '2D': '2D',
       '3D': '3D',
       '4D': '4D',
+    }
+  })
+  noiseType.on('change', () => {
+    restartAnimationCallback()
+  })
+  animationFolder.addBinding(params, 'noiseRadius')
+  animationFolder.addBinding(params, 'noiseScale')
+  animationFolder.addBinding(params, 'dotSize', { type: 'number', min: 0, max: 10, step: 0.1 })
+  animationFolder.addBinding(params, 'xStep', { type: 'number', min: 1, max: 100, step: 1 })
+  animationFolder.addBinding(params, 'yStep', { type: 'number', min: 1, max: 100, step: 1 })
+  animationFolder.addBinding(params, 'green', {
+    type: 'number',
+    min: 0,
+    max: 255,
+    step: 1,
+  })
+  animationFolder.addBinding(params, 'blue', {
+    type: 'number',
+    min: 0,
+    max: 255,
+    step: 1,
+  })
+  animationFolder.addBinding(params, 'red', {
+    type: 'number',
+    min: 0,
+    max: 255,
+    step: 1,
+  })
+  animationFolder.addBinding(params, 'greenTaper', {
+    options: {
+      none: 'none',
+      horizontal: 'horizontal',
+      vertical: 'vertical',
+      both: 'both',
+    },
+  })
+  animationFolder.addBinding(params, 'blueTaper', {
+    options: {
+      none: 'none',
+      horizontal: 'horizontal',
+      vertical: 'vertical',
+      both: 'both',
+    },
+  })
+  animationFolder.addBinding(params, 'redTaper', {
+    options: {
+      none: 'none',
+      horizontal: 'horizontal',
+      vertical: 'vertical',
+      both: 'both',
     },
   })
   animationFolder.addBinding(params, 'compositeOperation', {

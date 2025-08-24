@@ -1,36 +1,36 @@
-import alea from 'alea'
-import { createNoise2D, createNoise3D, createNoise4D } from 'simplex-noise'
-
-const SEED = 'snerk-2025-08-24'
-let noise2D = createNoise2D(alea(SEED))
-let noise3D = createNoise3D(alea(SEED))
-let noise4D = createNoise4D(alea(SEED))
+import { Pane } from 'tweakpane'
+import { getNoise } from './noise'
+import { params } from './params'
+import { setupTweakPane } from './tweakpane'
 
 /**
  * @type CanvasRenderingContext2D
  */
 let ctx
-let W, H, time, x0, y0, cx, cy, wW, hH, capturer
+let W, H, x0, y0, cx, cy, canvasWidth, canvasHeight, capturer, noise
 
 // 25 frames per second for 5 seconds => 125 frames per loop
-const TOTALT_FRAME_N = 25 * 5
-// Set true and reload to save a recording
-const RECORD = true
+const TOTALT_FRAME_N = params.frameRate * params.duration
 
 // 2π will give us the circumference of a circle
 const TWO_PI = Math.PI * 2
 
-
+/**
+ * @param {number} progress progress of the animation
+ * @param {number} offset
+ * @param {number} x
+ * @param {number} y
+ */
 function periodicFunction(progress, offset, x, y) {
   // R is the radius of the circle
-  const R = 1.6
+  const R = params.noiseRadius
   // S is the scale of the noise
   // const S = 0.016
-  const S = 0.007
+  const S = params.noiseScale
   // P is the progress of the animation
   const P = progress
 
-  return noise2D(
+  return noise(
     // return noise3D(
     // return noise4D(
     offset + R * Math.cos(P * TWO_PI),
@@ -44,14 +44,14 @@ function radialOffset(x, y) {
   return Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2))
 }
 
-function frame(n) {
+function drawFrame(n) {
   let progress = n / TOTALT_FRAME_N
-  ctx.fillStyle = '#000'
+  ctx.fillStyle = params.bgColor
 
-  ctx.fillRect(0, 0, wW, hH)
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
   ctx.save()
 
-  ctx.globalCompositeOperation = 'lighter'
+  ctx.globalCompositeOperation = params.compositeOperation
 
   // Loop over all pixels inside margin on the x-axis
   for (let i = x0; i < W; i += 10) {
@@ -84,55 +84,84 @@ function frame(n) {
 }
 
 function loop(frameN) {
+  // Uncomment to count frames in console (NB! this gets spammy)
   // console.log(frameN)
-  frame(frameN)
+  drawFrame(frameN)
   if (frameN < TOTALT_FRAME_N) {
+    // Continue the loop
     requestAnimationFrame(loop.bind(null, frameN + 1))
+    // Capture the frame if capturer is set
     if (capturer) {
       capturer.capture(ctx.canvas)
     }
   } else if (capturer) {
+    // Stop the capturer and save the video
     capturer.stop()
     capturer.save()
   } else {
+    // Restart the loop
     requestAnimationFrame(loop.bind(null, 0))
   }
 }
 
-// Initialize the canvas and capturer
-function init() {
-  time = new Date().getTime()
-  let canvas = document.createElement('canvas')
-  // let dim = 500
-  // let xDim = dim;
-  // let yDim = dim;
-  let xDim = 1080
-  let yDim = 1920
-  let margin = 55
-  // canvas.setAttribute("width", `${dim}px`);
-  // canvas.setAttribute("height", `${dim}px`);
-  canvas.setAttribute('width', `${xDim}px`)
-  canvas.setAttribute('height', `${yDim}px`)
-  document.body.appendChild(canvas)
-  ctx = canvas.getContext('2d')
-
-  wW = canvas.width
-  hH = canvas.height
-  W = wW - margin
-  H = hH - margin
+/**
+ * Resize the canvas to the target dimensions
+ * @param {HTMLCanvasElement} targetCanvas
+ */
+function resizeCanvas(targetCanvas) {
+  if (params.fillScreen) {
+    params.xDim = window.innerWidth
+    params.yDim = window.innerHeight
+  }
+  targetCanvas.setAttribute('width', `${params.xDim}px`)
+  targetCanvas.setAttribute('height', `${params.yDim}px`)
+  canvasWidth = targetCanvas.width
+  canvasHeight = targetCanvas.height
+  const margin = params.margin
+  W = canvasWidth - margin
+  H = canvasHeight - margin
   x0 = margin
   y0 = margin
-  cx = wW / 2
-  cy = hH / 2
-  if (RECORD) {
-    capturer = new CCapture({
-      format: 'webm',
-      workersPath: 'node_modules/ccapture.js/build/',
-      framerate: 25,
-      quality: 100,
-    })
-    capturer.start()
-  }
+  cx = canvasWidth / 2
+  cy = canvasHeight / 2
+}
+
+// Initialize the canvas and capturer
+function init() {
+  const canvas = document.createElement('canvas')
+  resizeCanvas(canvas)
+  document.body.appendChild(canvas)
+  ctx = canvas.getContext('2d')
+  noise = getNoise(params.noiseType)
+
+  const pane = new Pane()
+
+  setupTweakPane(pane)
+
+  pane.on('change', (event) => {
+    if (event.last) {
+      console.log(event)
+      resizeCanvas(canvas)
+      noise = getNoise(params.noiseType)
+    }
+    if (params.record) {
+      capturer = new CCapture({
+        format: 'webm',
+        workersPath: 'node_modules/ccapture.js/build/',
+        framerate: 25,
+        quality: 100,
+      })
+      capturer.start()
+    }
+  })
+
+  window.addEventListener('resize', () => {
+    if (params.fillScreen) {
+      params.xDim = window.innerWidth
+      params.yDim = window.innerHeight
+      resizeCanvas(canvas)
+    }
+  })
 }
 
 init()

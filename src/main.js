@@ -221,7 +221,9 @@ function init() {
   // Setup noise
   noise = getNoise(params)
 
-  const pane = new Pane()
+  const pane = new Pane({
+    title: 'Parameters',
+  })
 
   setupTweakPane(pane, params, startAnimation)
 

@@ -15,7 +15,6 @@ Then use [ffmpeg](https://ffmpeg.org/) to convert to mp4 with matching framerate
 
 ```sh
   ffmpeg -i path-to-exported.webm -r 25 output.mp4
-
 ```
 
 To generate a loop:
@@ -36,3 +35,11 @@ To modify node version for the project, update version number in `.nvmrc` and ru
 [direnv](https://direnv.net/) is used to help automate correct node version and keep npm packages up to date
 
 Run `direnv allow` to approve running the content of `.envrc`. NB! document what goes in that file extensively.
+
+## Running locally
+
+Call the `dev` script using npm to start a local web-server running the code. Vite should output a link to the local app, e.g. http://localhost:5173/
+
+```sh
+npm run dev
+```

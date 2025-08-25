@@ -13,3 +13,6 @@ node_modules/
 # webm or mp4 files
 *.webm
 *.mp4
+
+# build files
+dist/

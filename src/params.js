@@ -3,8 +3,8 @@ export const defaultParams = {
   seed: 'Snerk',
   // Noise
   noiseType: '3D',
-  noiseScale: 0.007,
-  noiseRadius: 0.2,
+  noiseScale: 0.002,
+  noiseRadius: 1.2,
   // Animation
   xStep: 10,
   yStep: 10,

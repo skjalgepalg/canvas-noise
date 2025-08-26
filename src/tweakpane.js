@@ -59,7 +59,10 @@ export const setupTweakPane = (pane, params, restartAnimationCallback) => {
     title: 'Animation',
     expanded: true,
   })
-  animationFolder.addBinding(params, 'seed')
+  const noiseSeed = animationFolder.addBinding(params, 'seed')
+  noiseSeed.on('change', () => {
+    restartAnimationCallback()
+  })
   const noiseType = animationFolder.addBinding(params, 'noiseType', {
     options: {
       '2D': '2D',

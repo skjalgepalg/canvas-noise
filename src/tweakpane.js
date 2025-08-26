@@ -46,6 +46,14 @@ export const setupTweakPane = (pane, params, restartAnimationCallback) => {
   })
   canvasFolder.addBinding(params, 'margin')
   canvasFolder.addBinding(params, 'bgColor', { type: 'color' })
+  const canvasColorButton = canvasFolder.addButton({
+    title: 'Randomize Canvas Color',
+    label: 'Randomize Canvas Color',
+  })
+  canvasColorButton.on('click', () => {
+    params.bgColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`
+    pane.refresh()
+  })
 
   const animationFolder = pane.addFolder({
     title: 'Animation',
@@ -84,6 +92,16 @@ export const setupTweakPane = (pane, params, restartAnimationCallback) => {
     min: 0,
     max: 255,
     step: 1,
+  })
+  const colorButton = animationFolder.addButton({
+    title: 'Randomize Colors',
+    label: 'Randomize Colors',
+  })
+  colorButton.on('click', () => {
+    params.green = Math.floor(Math.random() * 256)
+    params.blue = Math.floor(Math.random() * 256)
+    params.red = Math.floor(Math.random() * 256)
+    pane.refresh()
   })
   animationFolder.addBinding(params, 'greenTaper', {
     options: {

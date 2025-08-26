@@ -236,8 +236,9 @@ function init() {
 
   window.addEventListener('resize', () => {
     if (params.fillScreen) {
-      params.xDim = window.innerWidth
-      params.yDim = window.innerHeight
+      // Make sure the canvas dimensions are even, ffmpeg must be able to divise by 2 for encoding
+      params.xDim = window.innerWidth % 2 !== 0 ? window.innerWidth : window.innerWidth - 1
+      params.yDim = window.innerHeight % 2 !== 0 ? window.innerHeight : window.innerHeight - 1
       resizeCanvas(canvas)
     }
   })
